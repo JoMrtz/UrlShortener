@@ -7,8 +7,8 @@ namespace UrlShortener.Entities
     {
         [Key]
         public int ID { get; set; }
-        public int UrlOriginal { get; set; }
-        public int UrlShort { get; set; }
+        public string? UrlOriginal { get; set; }
+        public string? UrlShort { get; set; }
 
     }
 }
