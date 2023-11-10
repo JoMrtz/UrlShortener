@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics.Metrics;
 using UrlShortener.Data;
 using UrlShortener.Entities;
 using UrlShortener.Models;
@@ -18,7 +19,7 @@ namespace UrlShortener.Controllers
         }
 
         [HttpPost]
-        public IActionResult SendCompleteUrl([FromBody] UrlForConvertionDTO UrlFull)//por buenas practicas se manda por body y como es por body el content tyoe de from body es json() entonces 
+        public IActionResult SendCompleteUrl([FromBody] UrlForConvertionDTO UrlFull )//por buenas practicas se manda por body y como es por body el content tyoe de from body es json() entonces 
         {
             string ShortUrl = UrlShortCreator.GenerateShortUrl(6);
             Url url = new Url()
@@ -26,8 +27,9 @@ namespace UrlShortener.Controllers
                 UrlOriginal = UrlFull.UrlOriginal,
                 UrlShort = ShortUrl,
                 Counter = 0,
-                CategoriesId= 1 
+                CategoriesId= UrlFull.idCategoria
             };
+            
             _UrlContext.Url.Add(url);
             _UrlContext.SaveChanges();
             // int check = _UrlContext.SaveChanges();
@@ -35,12 +37,17 @@ namespace UrlShortener.Controllers
             return Ok(ShortUrl);
         }
         [HttpGet("{ShortUrl}")]//mandar el dato por url 
-        //
         public IActionResult GetFullUrl(string ShortUrl)
         {
-           
+            var urlhola = _UrlContext.Url.FirstOrDefault(u => u.UrlShort == ShortUrl);
+            if (urlhola == null) { 
+                return NotFound();
+            }
+            urlhola.Counter++;
+            _UrlContext.Update(urlhola);
+            _UrlContext.SaveChanges();
 
-            return Redirect(_UrlContext.Url.Where(u => u.UrlShort == ShortUrl).Select(u => u.UrlOriginal).FirstOrDefault());
+            return Redirect(urlhola.UrlOriginal);
 
         }
     }

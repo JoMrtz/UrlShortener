@@ -4,5 +4,6 @@
     {
         public int ID { get; set; }
         public string? UrlOriginal { get; set; } 
+        public int idCategoria { get; set; }
     }
 }
